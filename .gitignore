@@ -1,0 +1,84 @@
+# ============================================================================
+# FLVCR1/FLVCR2 Pipeline .gitignore
+# ============================================================================
+
+# ── Data directories (too large for git) ──
+data_raw/
+data_intermediate/
+data_results/
+figures/
+
+# Keep directory structure but ignore contents
+!data_raw/.gitkeep
+!data_intermediate/.gitkeep
+!data_results/.gitkeep
+!figures/.gitkeep
+
+# ── R ──
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+
+# renv library (too large)
+renv/library/
+renv/staging/
+
+# Keep renv.lock for reproducibility
+!renv.lock
+!renv/activate.R
+!renv/settings.dcf
+
+# ── Quarto/RMarkdown ──
+*.html
+*.pdf
+*_files/
+*.log
+
+# ── System files ──
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# ── Temporary files ──
+*.tmp
+*.bak
+*.old
+
+# ── Compressed files ──
+*.gz
+*.zip
+*.tar
+*.tar.gz
+
+# ── IDE ──
+.vscode/
+.idea/
+*.code-workspace
+
+# ── Python (if using any Python tools) ──
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+
+# ── Node (if using any JS tools) ──
+node_modules/
+
+# ── Large data files ──
+*.h5
+*.h5ad
+*.loom
+*.rds.gz
+*.mtx
+*.hdf5
+
+# ── Logs and temporary outputs ──
+*.out
+*.err
+logs/
+cache/
+
