@@ -21,8 +21,9 @@ dir_figs <- "figures"
 
 # Genes of interest
 genes_flvcr <- c("FLVCR1", "FLVCR2")
-genes_context <- c("PRM1", "PRM2", "TNP1", "TNP2", "CRISP2", "DNAJC5B", 
+genes_context <- c("PRM1", "PRM2", "TNP1", "TNP2", "CRISP2", "DNAJC5B",
                    "ACR", "SPACA7", "AKAP4", "ODF2")
+germ_stages <- c("Spermatogonia", "Spermatocytes", "RoundSpermatids", "ElongatingSpermatids")
 
 # ── Helper function: Calculate stage averages with bootstrap CI ──
 calc_stage_avg <- function(obj, genes, n_boot = 100) {
@@ -35,21 +36,25 @@ calc_stage_avg <- function(obj, genes, n_boot = 100) {
     return(NULL)
   }
   
-  # Set identity to cell type
-  Idents(obj) <- "celltype"
-  
-  # Average expression by stage
-  avg_expr <- AverageExpression(obj, features = genes, assays = "SCT")$SCT
-  
+  # Focus on germ cell stages only
+  germ_present <- intersect(germ_stages, unique(obj$celltype))
+  if (length(germ_present) == 0) {
+    warning("No germ cell stages found in object; skipping.")
+    return(NULL)
+  }
+
+  obj_germ <- subset(obj, subset = celltype %in% germ_present)
+  Idents(obj_germ) <- "celltype"
+
   # Bootstrap confidence intervals
-  stages <- levels(Idents(obj))
+  stages <- germ_present
   results_list <- list()
-  
+
   for (stage in stages) {
-    cells <- WhichCells(obj, idents = stage)
+    cells <- WhichCells(obj_germ, idents = stage)
     if (length(cells) == 0) next
-    
-    expr_mat <- GetAssayData(obj, assay = "SCT", slot = "data")[genes, cells, drop = FALSE]
+
+    expr_mat <- GetAssayData(obj_germ, assay = "SCT", slot = "data")[genes, cells, drop = FALSE]
     
     # Bootstrap
     boot_means <- replicate(n_boot, {
@@ -123,9 +128,8 @@ cat("\nGenerating visualizations...\n")
 # Filter to FLVCR genes (human datasets)
 flvcr_data <- combined_results %>%
   filter(Gene %in% c("FLVCR1", "FLVCR2")) %>%
-  mutate(Stage = factor(Stage, 
-                        levels = c("Spermatogonia", "Spermatocytes", 
-                                   "RoundSpermatids", "ElongatingSpermatids")))
+  mutate(Stage = factor(Stage,
+                        levels = germ_stages))
 
 # Line plot with error bars
 p1 <- ggplot(flvcr_data, aes(x = Stage, y = Mean, color = Gene, group = Gene)) +

@@ -7,6 +7,7 @@ suppressPackageStartupMessages({
   library(GEOquery)
   library(data.table)
   library(readr)
+  library(R.utils)
 })
 
 cat("=== FLVCR Pipeline: GEO Data Download ===\n\n")
