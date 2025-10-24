@@ -153,8 +153,12 @@ annotate_celltypes <- function(obj, markers, species = "human") {
   obj$celltype_confidence <- apply(auc_mtx, 2, max)
   
   # Visualize
+  dataset_label <- unique(as.vector(obj$dataset))
+  dataset_label <- dataset_label[!is.na(dataset_label)]
+  dataset_label <- if (length(dataset_label)) paste(dataset_label, collapse = ", ") else "Dataset"
+
   p1 <- DimPlot(obj, reduction = "umap", group.by = "celltype", label = TRUE) +
-    ggtitle(paste(unique(obj$dataset), "- Cell Types"))
+    ggtitle(paste(dataset_label, "- Cell Types"))
   
   # Feature plots for key markers
   key_markers <- c(
@@ -165,7 +169,7 @@ annotate_celltypes <- function(obj, markers, species = "human") {
   p2 <- FeaturePlot(obj, features = key_markers[1:min(4, length(key_markers))], ncol = 2)
   
   combined <- p1 / p2
-  ggsave(file.path(dir_figs, paste0("UMAP_celltypes_", unique(obj$dataset), ".png")), 
+  ggsave(file.path(dir_figs, paste0("UMAP_celltypes_", dataset_label, ".png")),
          combined, width = 10, height = 12)
   
   # Summary table
