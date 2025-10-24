@@ -190,14 +190,33 @@ if (length(genes_present) == 0) {
   cat("\nFitting tradeSeq GAM models...\n")
   
   tryCatch({
-    # Prepare count matrix for tradeSeq
-    counts_matrix <- GetAssayData(int_germ, assay = "RNA", slot = "counts")[genes_present, ]
-    
+    # Prepare data and remove cells without pseudotime assignment
+    valid_cells <- which(!is.na(pseudotime))
+
+    if (length(valid_cells) < length(pseudotime)) {
+      cat("  Filtering", length(pseudotime) - length(valid_cells),
+          "cells without pseudotime assignments before tradeSeq fit.\n")
+    }
+
+    if (length(valid_cells) < 5) {
+      stop("Insufficient cells with valid pseudotime for tradeSeq (n < 5).")
+    }
+
+    counts_matrix <- GetAssayData(int_germ, assay = "RNA", slot = "counts")[genes_present, valid_cells, drop = FALSE]
+    pseudotime_valid <- matrix(pseudotime[valid_cells], ncol = 1)
+
+    curve_weights <- slingCurveWeights(sce)
+    if (!is.null(curve_weights)) {
+      cell_weights <- as.matrix(curve_weights[valid_cells, 1, drop = FALSE])
+    } else {
+      cell_weights <- matrix(1, nrow = length(valid_cells), ncol = 1)
+    }
+
     # Fit GAM
     gam_fit <- fitGAM(
       counts = as.matrix(counts_matrix),
-      pseudotime = pseudotime,
-      cellWeights = matrix(1, ncol = 1, nrow = ncol(counts_matrix)),
+      pseudotime = pseudotime_valid,
+      cellWeights = cell_weights,
       nknots = 6,
       verbose = TRUE
     )

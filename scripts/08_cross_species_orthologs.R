@@ -17,15 +17,30 @@ dir_in <- "data_results"
 dir_out <- "data_results"
 dir_figs <- "figures"
 
+# Cache Ensembl connections to avoid repeated lookups and handle host overrides
+mart_cache <- new.env(parent = emptyenv())
+
 # ── Helper function: Get human-mouse orthologs via biomaRt ──
-get_human_mouse_orthologs <- function(human_genes) {
+get_human_mouse_orthologs <- function(human_genes, host = NULL) {
   cat("Querying biomaRt for human-mouse orthologs...\n")
   cat("This may take a few minutes...\n\n")
-  
+
   tryCatch({
-    # Connect to Ensembl
-    human <- useMart("ensembl", dataset = "hsapiens_gene_ensembl")
-    
+    # Reuse existing mart connection when available
+    cache_key <- if (is.null(host)) "default" else host
+
+    if (!exists(cache_key, envir = mart_cache)) {
+      cat("Connecting to Ensembl using useEnsembl()", if (!is.null(host)) paste("(host:", host, ")") else "", "...\n")
+      mart_obj <- if (is.null(host)) {
+        useEnsembl(biomart = "genes", dataset = "hsapiens_gene_ensembl")
+      } else {
+        useEnsembl(biomart = "genes", dataset = "hsapiens_gene_ensembl", host = host)
+      }
+      assign(cache_key, mart_obj, envir = mart_cache)
+    }
+
+    human <- get(cache_key, envir = mart_cache)
+
     # Get orthologs
     orthologs <- getBM(
       attributes = c(

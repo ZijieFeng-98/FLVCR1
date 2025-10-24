@@ -8,6 +8,7 @@ suppressPackageStartupMessages({
   library(limma)
   library(edgeR)
   library(DESeq2)
+  library(Biobase)
   library(Seurat)
   library(dplyr)
   library(ggplot2)
