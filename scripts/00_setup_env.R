@@ -24,6 +24,7 @@ pkgs <- c(
   "data.table",
   "readr",
   "jsonlite",
+  "R.utils",
   "BiocManager",
   
   # ── Single-cell RNA-seq ──
@@ -48,6 +49,7 @@ pkgs <- c(
   "DESeq2",
   "limma",
   "MuSiC",
+  "Biobase",
   # "BisqueRNA",  # Optional
   
   # ── Network analysis & enrichment ──
@@ -93,6 +95,7 @@ bioc_pkgs <- c(
   "edgeR",
   "DESeq2",
   "limma",
+  "Biobase",
   "biomaRt",
   "clusterProfiler",
   "fgsea",

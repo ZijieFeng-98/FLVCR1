@@ -204,6 +204,24 @@ Generates comprehensive HTML/PDF report with:
 
 ---
 
+## 🔁 Keeping your fork up to date
+
+If you do not see the latest local changes on GitHub, confirm the commit exists
+and push it to the remote repository:
+
+```bash
+git status        # ensure your working tree is clean
+git log --oneline # verify the new commit hash
+git push          # publish the commit to origin/<branch>
+```
+
+Only pushed commits appear on GitHub. Double-check that you are targeting the
+expected remote (`git remote -v`) and that you have permission to update that
+branch. When collaborating with others, open a pull request so reviewers can see
+the diff before merging.
+
+---
+
 ## ✅ Validation Criteria
 
 | Criterion | Threshold | Status |
